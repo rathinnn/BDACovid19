@@ -12,6 +12,5 @@ its libraries and Kafka will be the key technologies used.
 <p align="center">
 <img style="display: block; margin: auto;"
 src="https://user-images.githubusercontent.com/56340004/114648391-595eaa80-9cfc-11eb-8834-cb5dcc2ccd1a.png"><br>
-<b>System Architecture</b>
 </p>
 
