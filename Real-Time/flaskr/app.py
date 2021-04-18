@@ -14,20 +14,30 @@ import plotly
 import random
 import plotly.graph_objs as go
 from dash.dependencies import Output, Input
+from plots.mapPlot import updateMap
+import time
+
 ACCESS_TOKEN = open(".mapbox_token").read()
+print(ACCESS_TOKEN)
 #px.set_mapbox_access_token(ACCESS_TOKEN)
+
 req = requests.get('https://api.covid19api.com/live/country/india')
+while(req.status_code != 200):
+    time.sleep(5)
+    req = requests.get('https://api.covid19api.com/live/country/india')
+    
+
 
 spark = SparkSession.builder.appName("Trial.com").getOrCreate()
 json_rdd = spark.sparkContext.parallelize([req.json()])
 df = spark.read.json(json_rdd)
 df = df.withColumn("Date",df.Date.cast(TimestampType())).withColumn("Lat",df.Lat.cast(DoubleType())).withColumn("Lon",df.Lon.cast(DoubleType()))  
-df = df.filter(df.Date>"2021-04-16")
-print(df.head())
+df = df.filter(df.Date>"2021-04-18")
+#print(df.head())
 
 app = dash.Dash()
 app.layout = html.Div(
-    [dcc.Graph(id="world-live", animate = True),dcc.Interval(id = 'update',interval = 100000,n_intervals = 0)]
+    [dcc.Graph(id="world-live", animate = True),dcc.Interval(id = 'update',interval = 10000,n_intervals = 0)]
     
 )
 
@@ -39,44 +49,9 @@ app.layout = html.Div(
     ]
 )
 
-def update_graph_world(n):
-    s = df.select("Active").rdd.flatMap(lambda x: x).collect()
-    '''
-    fig = px.scatter_mapbox(
-            
-            lat= df.select("Lat").rdd.flatMap(lambda x: x).collect(),
-            lon= df.select("Lon").rdd.flatMap(lambda x: x).collect(),
-            color= s,
-            size= s,
-            zoom = 4,
-            size_max=50,
-            
-            hover_name= df.select("Province").rdd.flatMap(lambda x: x).collect(),
-            hover_data=[s],
-            
-        )
-    '''
-    fig = go.Figure(
-        go.Scattermapbox(
-            lat = df.select("Lat").rdd.flatMap(lambda x: x).collect(),
-            lon = df.select("Lon").rdd.flatMap(lambda x: x).collect(),
-            mode ='markers',
-            marker=go.scattermapbox.Marker(
-                size= s,
-                sizeref = 5000,
-                color = s
-            )
-        )
-    )
-    fig.update_layout(
-        mapbox=dict(
-            accesstoken=ACCESS_TOKEN, 
-            
-            zoom=4
-        )
-    )
-  
-    return fig
+def update(n):
+    return updateMap(go,df,px,n,ACCESS_TOKEN)
+
 
 if __name__ == '__main__':
     app.run_server()

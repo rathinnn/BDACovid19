@@ -52,7 +52,7 @@ fig = go.Figure(
 )
 fig.update_layout(
     mapbox=dict(
-        accesstoken='pk.eyJ1IjoiYmx1ZWJsYXplNyIsImEiOiJja25rOGt2MDcwOGo1MnFueGpkdm9odDloIn0.YqJl4MIiAnAunAkISErfEg', #
+        #accesstoken='pk.eyJ1IjoiYmx1ZWJsYXplNyIsImEiOiJja25rOGt2MDcwOGo1MnFueGpkdm9odDloIn0.YqJl4MIiAnAunAkISErfEg', #
         
         zoom=4
     )
