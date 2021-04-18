@@ -1,5 +1,3 @@
-
-import time
 def updateMap(go,df,px,n,ACCESS_TOKEN):
     s = df.select("Active").rdd.flatMap(lambda x: x).collect()
 
@@ -30,4 +28,4 @@ def updateMap(go,df,px,n,ACCESS_TOKEN):
     
 
   
-    return fig
+   
