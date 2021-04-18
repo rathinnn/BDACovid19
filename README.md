@@ -15,9 +15,10 @@ src="https://user-images.githubusercontent.com/56340004/114648391-595eaa80-9cfc-
 </p>
 
 <b><ins>Data Analysis and ML Modelling</ins></b>
+<br /> 
 For the data analysis and ML modelling, we’ll be using the postman API for data collection and use Kafka to read from these api’s , process, divide and publish them to multiple topics. We’ll use spark sql for structuring the datasets and then use the pandas library for creating data frames for Modelling. The Sklearn library will be used to train our ML linear prediction model. We’ll be visualizing the predictions using the Matplotlib and seaborn library. Finally the whole application will be created as a Flask App using the Docker image of the model which will then be deployed on a Kubernetes cluster.
 
-
+<br /> 
 
 #### Data Analysis and ML Modelling System Architecture
 <p align="center">
