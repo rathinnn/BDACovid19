@@ -9,7 +9,7 @@ from kafka import KafkaProducer
 
 
 producer = KafkaProducer(bootstrap_servers='localhost:9092',value_serializer=lambda v: json.dumps(v).encode('utf-8'))
-countries = ['india']#,'pk','np']
+countries = ['india','pk','np']
 for country in countries:
 
     h = requests.get('https://corona.lmao.ninja/v2/historical/'+country+'?lastdays=200')
