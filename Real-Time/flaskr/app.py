@@ -24,8 +24,22 @@ map_json = getInititalMap()
 
 
 spark = SparkSession.builder.appName("local").getOrCreate()
-
-df = getinitialMapDF(spark,map_json)
+spark.sparkContext.setLogLevel("ERROR")
+#df = getinitialMapDF(spark,map_json)
+df = spark \
+  .readStream \
+  .format("kafka") \
+  .option("kafka.bootstrap.servers", "localhost:9092") \
+  .option("startingOffsets", "latest") \
+  .option("subscribe", "test2") \
+  .load()
+schema = StructType([ \
+    StructField("Lat",TimestampType(),True), \
+    StructField("Lon",TimestampType(),True), \
+    StructField("Province",StringType(),True), \
+    StructField("Active",IntegerType(),True)
+    ])
+    #StructField("index",IntegerType(),True), \
 #print(df.head())
 
 app = dash.Dash()

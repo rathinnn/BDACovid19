@@ -7,3 +7,5 @@ def getinitialMapDF(spark,map_json):
     df = df.withColumn("Date",df.Date.cast(TimestampType())).withColumn("Lat",df.Lat.cast(DoubleType())).withColumn("Lon",df.Lon.cast(DoubleType()))  
     df = df.filter(df.Date>"2021-04-18")
     return df
+
+def getMapStreamingDF(spark)

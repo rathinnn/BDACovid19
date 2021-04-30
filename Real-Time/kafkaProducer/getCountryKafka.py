@@ -9,7 +9,7 @@ from sendToTopic import sendToMapTopic
 
 datetimetoday = datetime.datetime.utcnow()
 #maybeToday = datetoday.day
-#todaydate = datetoday.date()
+todaydate = datetime.date.today()
 yesterday = todaydate - datetime.timedelta(days=1)
 producer = KafkaProducer(bootstrap_servers='localhost:9092',value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 i = 0
