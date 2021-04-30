@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Fri Apr 30 13:24:07 IST 2021:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0179-21c5-435f-00000f5acab0 
+on database directory /home/rathinnn/BDACovid19/Real-Time/flaskr/metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@581a0bf 
+Loaded from file:/opt/spark/jars/derby-10.12.1.1.jar
+java.vendor=Private Build
+java.runtime.version=1.8.0_282-8u282-b08-0ubuntu1~18.04-b08
+user.dir=/home/rathinnn/BDACovid19/Real-Time/flaskr
+os.name=Linux
+os.arch=amd64
+os.version=5.4.0-70-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
