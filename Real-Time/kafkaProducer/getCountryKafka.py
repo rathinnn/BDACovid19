@@ -20,10 +20,10 @@ try:
     while True:
         maybeTom = datetime.datetime.utcnow().day
         if(maybeToday != maybeTom):
-        for country in countries:
-            sendToMapTopic(requests,country,producer,yesterday,time)
+            for country in countries:
+                sendToMapTopic(requests,country,producer,yesterday,time)
 
-            #maybeToday = maybeTom
+                #maybeToday = maybeTom
         
         time.sleep(800)
         i += 1

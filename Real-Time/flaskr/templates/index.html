@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>{{ title }}</title>
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/styles.css') }}" />
+  <link rel="stylesheet" href="https://use.typekit.net/uqq2lcv.css">
+  <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+      crossorigin="anonymous"
+  />
+</head>
+
+<body class="home-template">
+  <div class="container">
+    <div class="card">
+  
+        <h1 class="site-title">{{ title }}</h1>
+        <p class="subtitle">Visit Our Covid Dashboard</p>
+        <a href="/dashboard/" class="dash-link">
+          <span>Go To Dashboard</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+  </div>
+
+</body>
+
+</html>
