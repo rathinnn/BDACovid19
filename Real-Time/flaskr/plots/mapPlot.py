@@ -7,7 +7,7 @@ def updateMap(go,mapDf,px,ACCESS_TOKEN):
     #print(str(datetimetoday))
     todaydate = d[0]
     df = mapDf.filter(mapDf.Date>str(todaydate))
-    #df.show()
+    df.show()
     #mapDf.show()
     s = df.select("Active").rdd.flatMap(lambda x: x).collect()
 

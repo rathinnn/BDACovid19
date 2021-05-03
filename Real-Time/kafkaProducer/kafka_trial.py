@@ -17,6 +17,7 @@ try:
     while True:
         maybeTom = datetime.datetime.utcnow().day
         if(maybeToday != maybeTom or i==0):
+            maybeToday = maybeTom
             todaydate = datetime.date.today()
             yesterday = todaydate - datetime.timedelta(days=1)
             req = requests.get('https://api.covid19api.com/live/country/us/status/confirmed/date/'+str(yesterday))

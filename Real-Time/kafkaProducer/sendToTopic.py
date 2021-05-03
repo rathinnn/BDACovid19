@@ -5,6 +5,8 @@ def sendToMapTopic(requests,country,producer,yesterday,time):
         time.sleep(10)
         req = requests.get(geturl)
     for entry in req.json():
+        entry['Lat'] = float(entry['Lat'])
+        entry['Lon'] = float(entry['Lon'])
         producer.send(country+'Maptopic' , entry)
 
 
