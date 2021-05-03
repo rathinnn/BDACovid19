@@ -12,28 +12,31 @@ i = 0
 datetimetoday = datetime.datetime.utcnow()
 maybeToday = datetimetoday.day
 todaydate = datetime.date.today()
-
+country = 'india'
 try:
+    i=0
     while True:
-        maybeTom = datetime.datetime.utcnow().day
-        if(maybeToday != maybeTom or i==0):
-            maybeToday = maybeTom
-            todaydate = datetime.date.today()
-            yesterday = todaydate - datetime.timedelta(days=1)
-            req = requests.get('https://api.covid19api.com/live/country/us/status/confirmed/date/'+str(yesterday))
-            while(req.status_code != 200):
-                time.sleep(10)
-                req = requests.get('https://api.covid19api.com/live/country/us/status/confirmed/date/'+str(yesterday))
-            reqjson = req.json();
-            for h in reqjson:
-                h['Lat'] = float(h['Lat'])
-                h['Lon'] = float(h['Lon'])
-                producer.send('test2' , h)
-            print('Ready')
+        
+        if(i==0):
+            i+=1
+            h = requests.get('https://corona.lmao.ninja/v2/historical/'+country+'?lastdays=200')
         else:
-            print('Still Not ready')
-        time.sleep(200)
-        i += 1
+            h = requests.get('https://corona.lmao.ninja/v2/historical/'+country+'?lastdays=1')
+        k = h.json()
+        l = k['timeline']
+        cases = l['cases']
+        deaths = l['deaths']
+        recovered = l['recovered']
+        jsonlist = []
+
+
+        for key in cases:
+            jsondict = {'Date':str(datetime.datetime.strptime(key, '%m/%d/%y')),'Cases':cases[key],'Deaths':deaths[key],'Recovered':recovered[key]}
+            jsonlist.append(jsondict)
+
+        for jso in jsonlist:
+            producer.send('test2',jso)
+        time.sleep(20)
 except KeyboardInterrupt:
 
     print("Press Ctrl-C to terminate while statement")

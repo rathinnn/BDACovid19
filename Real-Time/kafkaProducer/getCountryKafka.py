@@ -5,7 +5,6 @@ from kafka import KafkaProducer
 from datetime import timezone
 import requests
 import datetime
-import calendar
 from sendToTopic import sendToMapTopic
 
 datetimetoday = datetime.datetime.utcnow()
