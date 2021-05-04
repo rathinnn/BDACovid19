@@ -1,5 +1,6 @@
 import dash
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 import pandas as pd
 import plotly.express as px
@@ -10,7 +11,8 @@ from pyspark.sql import SparkSession
 import plotly
 import random
 import plotly.graph_objs as go
-from dash.dependencies import Output, Input
+from dash.dependencies import Input, Output, State
+
 from plots.mapPlot import updateMap
 from plots.graphPlot import updateCases, updateDeaths, updateRecovered
 from getData import getInititalMap
@@ -18,6 +20,7 @@ from SparkJobs import getinitialMapDF, startMapStreamingDF, IndiaMapDF, USMapDF,
 from SparkJobs import IndiaTotalDF, UKTotalDF, USTotalDF, RussiaTotalDF
 
 def init_dashboard(server):
+
     ACCESS_TOKEN = open(".mapbox_token").read()
     #print(ACCESS_TOKEN)
     #px.set_mapbox_access_token(ACCESS_TOKEN)
@@ -53,95 +56,185 @@ def init_dashboard(server):
     allgraphs["UK"] = uktotalDf
     allgraphs["Russia"] =russiatotalDf
     #----------------------------------------------
-
-    app = dash.Dash(server = server,routes_pathname_prefix="/dashboard/")
     countries = ["India","USA","UK","Russia"]
-    
-    app.layout = html.Div(
-        children=[
-            html.Div(
-                children=[
-                    
-                    html.H1(
-                        children="Covid Dashboard", className="dash-head1"
-                    ),
-                    html.P(
-                        children="Developed For 19AIE214 Big Data Analytics By Group 8",
-                        className="dash-desc",
-                    ),
+
+    SIDEBAR_STYLE = {
+        'position': 'fixed',
+        'top': 0,
+        'left': 0,
+        'bottom': 0,
+        'width': '20%',
+        'padding': '20px 10px',
+        'background-color': '#f8f9fa'
+    }
+
+    # the style arguments for the main content page.
+    CONTENT_STYLE = {
+        'margin-left': '25%',
+        'margin-right': '5%',
+        'padding': '20px 10p'
+    }
+
+    TEXT_STYLE = {
+        'textAlign': 'center',
+        'color': '#191970'
+    }
+
+    CARD_TEXT_STYLE = {
+        'textAlign': 'center',
+        'color': '#0074D9'
+    }
+
+    controls = dbc.FormGroup(
+        [
+            html.P('Country', style={
+                'textAlign': 'center'
+            }),
+            dcc.Dropdown(
+                id="country",
+                options=[
+                    {"label": country, "value": country}
+                    for country in countries
                 ],
-                className="dashheader",
-            ),
-            html.Div(
-                children=[
-                    html.Div(
-                        children=[
-                            html.Div(children="Country", className="menu-title"),
-                            dcc.Dropdown(
-                                id="country",
-                                options=[
-                                    {"label": country, "value": country}
-                                    for country in countries
-                                ],
-                                value="India",
-                                clearable=False,
-                                className="countrydrop",
-                            ),
-                        ]
-                    ),
-
-                ],
-                className="menu",
-            ),
-            html.Div(
-                [
-                    html.Div(
-                        children= dcc.Graph(
-                            id="world-live", 
-                            #animate = True
-                        ), 
-                        
-                    ),
-
-                    html.Div(
-                        children=dcc.Graph(
-                            id="cases-chart",
-                        
-                        ),
-                        className="card",
-                    ),
-
-                    html.Div(
-                        children=dcc.Graph(
-                            id="deaths-chart",
-                        
-                        ),
-                        className="card",
-                    ),
-
-                    html.Div(
-                        children=dcc.Graph(
-                            id="recovered-chart",
-                        
-                        ),
-                        className="card",
-                    ),
-
-                    dcc.Interval(id = 'update',interval = 2000000,n_intervals = 0),
-                ],
+                value="India",
                 
-                className="wrapper",
+                
             ),
+            html.Div([dcc.Interval(id = 'update',interval = 2000000,n_intervals = 0)])
         ]
     )
-   
+
+    sidebar = html.Div(
+        [
+            html.Hr(),
+            controls
+        ],
+        style=SIDEBAR_STYLE,
+    )
+
+    content_first_row = dbc.Row([
+        dbc.Col(
+            dbc.Card(
+                [
+
+                    dbc.CardBody(
+                        [
+                            html.H4(id='Total_Cases', children=['Total Cases'], className='card-title',
+                                    style=CARD_TEXT_STYLE),
+                            html.P(id='card_cases', children=['number'], style=CARD_TEXT_STYLE),
+                        ]
+                    )
+                ]
+            ),
+            md=3
+        ),
+        dbc.Col(
+            dbc.Card(
+                [
+
+                    dbc.CardBody(
+                        [
+                            html.H4(id='Total_Deaths', children=['Total Deaths'], className='card-title',
+                                    style=CARD_TEXT_STYLE),
+                            html.P(id='card_deaths', children=['number'], style=CARD_TEXT_STYLE),
+                        ]
+                    ),
+                ]
+
+            ),
+            md=3
+        ),
+        dbc.Col(
+            dbc.Card(
+                [
+                    dbc.CardBody(
+                        [
+                            html.H4(id='Total_Recovered', children=['Total Recovered'], className='card-title',
+                                    style=CARD_TEXT_STYLE),
+                            html.P(id='card_recovered', children=['number'], style=CARD_TEXT_STYLE),
+                        ]
+                    ),
+                ]
+
+            ),
+            md=3
+        ),
+        dbc.Col(
+            dbc.Card(
+                [
+                    dbc.CardBody(
+                        [
+                            html.H4(id='Total_words', children=['Total Words'], className='card-title',
+                                    style=CARD_TEXT_STYLE),
+                            html.P(id='card_words', children=['number'], style=CARD_TEXT_STYLE),
+                        ]
+                    ),
+                ]
+            ),
+            md=3
+        )
+    ])
+
+    content_second_row = dbc.Row(
+        [
+            dbc.Col(
+                dcc.Graph(id="world-live"), md=12
+            )
+
+        ]
+    )
+
+    content_third_row = dbc.Row(
+        [
+            dbc.Col(
+                dcc.Graph(id='cases-chart'), md=12
+            )
+        ]
+    )
+
+    content_fourth_row = dbc.Row(
+        [
+            dbc.Col(
+                dcc.Graph(id='deaths-chart'), md=12
+            )
+        ]
+    )
+
+    content_fifth_row = dbc.Row(
+        [
+            dbc.Col(
+                dcc.Graph(id='recovered-chart'), md=12
+            )
+        ]
+    )
+
+    content = html.Div(
+        [
+            html.H2('Covid Dashboard', style=TEXT_STYLE),
+            html.Hr(),
+            content_first_row,
+            html.Hr()
+            content_second_row,
+            html.Hr()
+            content_third_row,
+            html.Hr()
+            content_fourth_row,
+            html.Hr()
+            content_fifth_row
+        ],
+        style=CONTENT_STYLE
+    )
+
+    app = dash.Dash(server = server,routes_pathname_prefix="/dashboard/",external_stylesheets=[dbc.themes.BOOTSTRAP])
+    
+    app.layout = html.Div([sidebar, content])
 
     @app.callback([Output("world-live", "figure") , Output("cases-chart", "figure") , Output("deaths-chart", "figure") ,Output("recovered-chart", "figure")],[Input("update", "n_intervals"),Input("country", "value")])
     def update(n_intervals,country):
         print(country)
         curmapdf = allmaps[country]
         curtotaldf = allgraphs[country]
-        #curdf.show()
+        curtotaldf.show()
         ndf = curtotaldf.toPandas()
         #x = curtotaldf.select("Date").rdd.flatMap(lambda x: x).collect()
         #y1 = curtotaldf.select("Cases").rdd.flatMap(lambda x: x).collect()
@@ -155,4 +248,6 @@ def init_dashboard(server):
 
     return app.server
 
-    
+
+
+
