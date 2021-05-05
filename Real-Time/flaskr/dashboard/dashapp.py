@@ -18,6 +18,7 @@ from plots.graphPlot import updateCases, updateDeaths, updateRecovered
 from getData import getInititalMap
 from SparkJobs import getinitialMapDF, startMapStreamingDF, IndiaMapDF, USMapDF, UKMapDF, RussiaMapDF
 from SparkJobs import IndiaTotalDF, UKTotalDF, USTotalDF, RussiaTotalDF
+from KafkaJobs import getConsumer,getDict, getGenerator
 
 def init_dashboard(server):
 
@@ -56,6 +57,26 @@ def init_dashboard(server):
     allgraphs["UK"] = uktotalDf
     allgraphs["Russia"] =russiatotalDf
     #----------------------------------------------
+    #Latest
+    allconsumers = {}
+    allconsumers["India"] = getConsumer("India")
+    allconsumers["USA"] = getConsumer("USA")
+    allconsumers["Russia"] = getConsumer("Russia")
+    allconsumers["UK"] = getConsumer("UK")
+
+    allgenerators = {}
+    allgenerators["India"] = getGenerator(allconsumers["India"])
+    allgenerators["USA"] = getGenerator(allconsumers["USA"])
+    allgenerators["Russia"] = getGenerator(allconsumers["Russia"])
+    allgenerators["UK"] = getGenerator(allconsumers["UK"])
+
+    allprevdicts = {}
+    allprevdicts["India"] = {}
+    allprevdicts["USA"] = {}
+    allprevdicts["Russia"] = {}
+    allprevdicts["UK"] = {}
+    
+    print("Start Kafka Now")
     countries = ["India","USA","UK","Russia"]
 
     SIDEBAR_STYLE = {
@@ -65,14 +86,18 @@ def init_dashboard(server):
         'bottom': 0,
         'width': '20%',
         'padding': '20px 10px',
-        'background-color': '#f8f9fa'
+        'background-color': '#A35709'
+    }
+
+    CARD_STYLE = {
+        'background-color': '#6D98AB'
     }
 
     # the style arguments for the main content page.
     CONTENT_STYLE = {
         'margin-left': '25%',
         'margin-right': '5%',
-        'padding': '20px 10p'
+        #'padding': '20px 10p'
     }
 
     TEXT_STYLE = {
@@ -82,13 +107,14 @@ def init_dashboard(server):
 
     CARD_TEXT_STYLE = {
         'textAlign': 'center',
-        'color': '#0074D9'
+        'color': '#FFFFFF'
     }
 
     controls = dbc.FormGroup(
         [
             html.P('Country', style={
-                'textAlign': 'center'
+                'textAlign': 'center',
+                'color' : '#FFFFFF'
             }),
             dcc.Dropdown(
                 id="country",
@@ -100,7 +126,8 @@ def init_dashboard(server):
                 
                 
             ),
-            html.Div([dcc.Interval(id = 'update',interval = 2000000,n_intervals = 0)])
+            html.Div([dcc.Interval(id = 'update',interval = 2000000,n_intervals = 0)]),
+            html.Div([dcc.Interval(id = 'update2',interval = 600000,n_intervals = 0)])
         ]
     )
 
@@ -124,7 +151,8 @@ def init_dashboard(server):
                             html.P(id='card_cases', children=['number'], style=CARD_TEXT_STYLE),
                         ]
                     )
-                ]
+                ],
+                style = CARD_STYLE
             ),
             md=3
         ),
@@ -139,7 +167,8 @@ def init_dashboard(server):
                             html.P(id='card_deaths', children=['number'], style=CARD_TEXT_STYLE),
                         ]
                     ),
-                ]
+                ],
+                style = CARD_STYLE
 
             ),
             md=3
@@ -154,7 +183,8 @@ def init_dashboard(server):
                             html.P(id='card_recovered', children=['number'], style=CARD_TEXT_STYLE),
                         ]
                     ),
-                ]
+                ],
+                style = CARD_STYLE
 
             ),
             md=3
@@ -169,7 +199,76 @@ def init_dashboard(server):
                             html.P(id='card_words', children=['number'], style=CARD_TEXT_STYLE),
                         ]
                     ),
-                ]
+                ],
+                style = CARD_STYLE
+            ),
+            md=3
+        )
+    ])
+
+
+    content_first_row2 = dbc.Row([
+        dbc.Col(
+            dbc.Card(
+                [
+
+                    dbc.CardBody(
+                        [
+                            html.H4(id='New_Cases', children=['New Cases'], className='card-title',
+                                    style=CARD_TEXT_STYLE),
+                            html.P(id='new_cases', children=['number'], style=CARD_TEXT_STYLE),
+                        ]
+                    )
+                ],
+                style = CARD_STYLE
+            ),
+            md=3
+        ),
+        dbc.Col(
+            dbc.Card(
+                [
+
+                    dbc.CardBody(
+                        [
+                            html.H4(id='New_Deaths', children=['New Deaths'], className='card-title',
+                                    style=CARD_TEXT_STYLE),
+                            html.P(id='new_deaths', children=['number'], style=CARD_TEXT_STYLE),
+                        ]
+                    ),
+                ],
+                style = CARD_STYLE
+
+            ),
+            md=3
+        ),
+        dbc.Col(
+            dbc.Card(
+                [
+                    dbc.CardBody(
+                        [
+                            html.H4(id='Fatality_rate', children=['Fatality Rate'], className='card-title',
+                                    style=CARD_TEXT_STYLE),
+                            html.P(id='fatality_rate', children=['number'], style=CARD_TEXT_STYLE),
+                        ]
+                    ),
+                ],
+                style = CARD_STYLE
+
+            ),
+            md=3
+        ),
+        dbc.Col(
+            dbc.Card(
+                [
+                    dbc.CardBody(
+                        [
+                            html.H4(id='Active_cases', children=['Active cases'], className='card-title',
+                                    style=CARD_TEXT_STYLE),
+                            html.P(id='active_cases', children=['number'], style=CARD_TEXT_STYLE),
+                        ]
+                    ),
+                ],
+                style = CARD_STYLE
             ),
             md=3
         )
@@ -213,13 +312,15 @@ def init_dashboard(server):
             html.H2('Covid Dashboard', style=TEXT_STYLE),
             html.Hr(),
             content_first_row,
-            html.Hr()
+            html.Hr(),
+            content_first_row2,
+            html.Hr(),
             content_second_row,
-            html.Hr()
+            html.Hr(),
             content_third_row,
-            html.Hr()
+            html.Hr(),
             content_fourth_row,
-            html.Hr()
+            html.Hr(),
             content_fifth_row
         ],
         style=CONTENT_STYLE
@@ -234,7 +335,7 @@ def init_dashboard(server):
         print(country)
         curmapdf = allmaps[country]
         curtotaldf = allgraphs[country]
-        curtotaldf.show()
+        #print(curtotaldf.count())
         ndf = curtotaldf.toPandas()
         #x = curtotaldf.select("Date").rdd.flatMap(lambda x: x).collect()
         #y1 = curtotaldf.select("Cases").rdd.flatMap(lambda x: x).collect()
@@ -246,7 +347,24 @@ def init_dashboard(server):
         y3 = ndf['Recovered']
         return updateMap(go,curmapdf,px,ACCESS_TOKEN), updateCases(go,x,y1) , updateDeaths(go,x,y2), updateRecovered(go, x, y3)
 
+    @app.callback([Output("card_cases", "children") , Output("card_deaths", "children") , Output("card_recovered", "children") ,Output("new_cases", "children") , Output("new_deaths", "children") , Output("fatality_rate", "children") , Output("active_cases", "children")],[Input("update2", "n_intervals"),Input("country", "value")])
+    def update2(n_intervals,country):
+        curgenerator = allgenerators[country]
+        curprevdict = allprevdicts[country]
+        curdict , success = getDict(curgenerator,curprevdict)
+
+        if(success):
+            allprevdicts[country] = curdict
+        else:
+            allgenerators[country] = getGenerator(allconsumers[country])
+        
+        #print(curdict)
+        return (curdict.value['TotalCases'],curdict.value['TotalDeaths'],curdict.value['TotalRecovered'],curdict.value['NewCases'],curdict.value['NewDeaths'],curdict.value['Case_Fatality_Rate'],curdict.value['ActiveCases'])
+
+
+
     return app.server
+
 
 
 

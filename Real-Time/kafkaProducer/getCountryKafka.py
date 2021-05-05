@@ -26,12 +26,12 @@ try:
             yesterday = todaydate - datetime.timedelta(days=1)
             for country in countries:
                 sendToMapTopic(requests,country,producer,yesterday,time)
-
+                time.sleep(5)
                 #maybeToday = maybeTom
             print('Ready')
         else:
             print('Still Not ready')
-        time.sleep(800)
+        time.sleep(20)
         i += 1
 except KeyboardInterrupt:
 

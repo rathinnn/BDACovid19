@@ -1,6 +1,7 @@
 
 def updateCases(go,x,y):
     #df = tdf.sort("Date")
+    
     fig = go.Figure([go.Scatter(
             
 
@@ -13,11 +14,19 @@ def updateCases(go,x,y):
 
     fig.update_layout(
         title={
-            'text': "Cases",
-            'y':0.5,
+            'text': "Plot of Total Cases",
+            'y':0.9,
             'x':0.5,
             'xanchor': 'center',
-            'yanchor': 'top'})
+            'yanchor': 'top'},
+        xaxis = {
+            'title' : 'Date'
+        },
+        yaxis = {
+            'title' : 'Total Cases'
+        }    
+            
+            )
     return fig
     
 def updateDeaths(go, x,y):
@@ -34,11 +43,19 @@ def updateDeaths(go, x,y):
 
     fig.update_layout(
         title={
-            'text': "Deaths",
-            'y':0.5,
+            'text': "Plot of Total Deaths",
+            'y':0.9,
             'x':0.5,
             'xanchor': 'center',
-            'yanchor': 'top'})
+            'yanchor': 'top'},
+        xaxis = {
+            'title' : 'Date'
+        },
+        yaxis = {
+            'title' : 'Total Deaths'
+        }    
+            
+            )
     return fig
 
 def updateRecovered(go,x,y):
@@ -55,11 +72,19 @@ def updateRecovered(go,x,y):
 
     fig.update_layout(
         title={
-            'text': "Recovered",
-            'y':0.5,
+            'text': "Plot of Total Recovered",
+            'y':0.9,
             'x':0.5,
             'xanchor': 'center',
-            'yanchor': 'top'})
+            'yanchor': 'top'},
+        xaxis = {
+            'title' : 'Date'
+        },
+        yaxis = {
+            'title' : 'Total Recovered'
+        }    
+            
+            )
     return fig
     
 

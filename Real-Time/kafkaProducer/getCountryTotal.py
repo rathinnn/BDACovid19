@@ -16,7 +16,7 @@ try:
         for country in countries:
             if(i==0):
                 
-                h = requests.get('https://corona.lmao.ninja/v2/historical/'+country+'?lastdays=200')
+                h = requests.get('https://corona.lmao.ninja/v2/historical/'+country+'?lastdays=300')
             else:
                 h = requests.get('https://corona.lmao.ninja/v2/historical/'+country+'?lastdays=1')
             k = h.json()
@@ -32,8 +32,9 @@ try:
                 jsonlist.append(jsondict)
 
             sendToCountryTotalTopic(producer,country,jsonlist)
-            #time.sleep(20)
+            time.sleep(5)
         i+=1
+        print("Ready 2")
         time.sleep(800)
         
 except KeyboardInterrupt:
