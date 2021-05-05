@@ -12,10 +12,9 @@ df = spark \
   .load()
 schema = StructType([ \
     StructField("Date",TimestampType(),True),\
-    StructField("Lat",DoubleType(),True), \
-    StructField("Lon",DoubleType(),True), \
-    StructField("Province",StringType(),True), \
-    StructField("Active",IntegerType(),True)
+    StructField("Cases",IntegerType(),True), \
+    StructField("Deaths",IntegerType(),True), \
+    StructField("Recovered",IntegerType(),True)
     ])
     #StructField("index",IntegerType(),True), \
 
@@ -23,7 +22,7 @@ df2 = df.selectExpr("CAST(value AS STRING)")
 df2.printSchema()
 schemad = df2.select( from_json(df2.value,schema).alias('value') )
 schemad.printSchema()
-schemad2 = schemad.selectExpr("value.Lat", "value.Lon","value.Active","value.Province","value.Date")
+schemad2 = schemad.selectExpr("value.Date", "value.Cases","value.Deaths","value.Recovered").dropDuplicates(["Date"])
 #schmead2 = schemad2.withColumn("Lat",schemad2.Lat.cast(DoubleType())).withColumn("Lon",schemad2.Lon.cast(DoubleType()))  
 schemad2.printSchema()
 query = schemad2 \
@@ -33,7 +32,7 @@ query = schemad2 \
     .outputMode("Append")\
     .start()
 
-query.awaitTermination()
+#query.awaitTermination()
 
 #df.select(df.key, get_json_object(df.jstring, '$.f1').alias("c0"), get_json_object(df.jstring, '$.f2').alias("c1") ).collect()
 #spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.0 trial.py

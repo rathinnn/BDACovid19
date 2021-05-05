@@ -1,40 +1,49 @@
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
+import requests
 import pandas as pd
-import plotly.express as px
-#import findspark
-#findspark.init()
-from pyspark.sql import SparkSession
+import re
+from flask import Flask
+from flask import render_template
+from dashboard.dashapp import init_dashboard
 
-import plotly
-import random
-import plotly.graph_objs as go
-from dash.dependencies import Output, Input
-from plots.mapPlot import updateMap
-from getData import getInititalMap
-from SparkJobs import getinitialMapDF, startMapStreamingDF
+app = Flask(__name__, instance_relative_config=False)
+app = init_dashboard(app)
 
-ACCESS_TOKEN = open(".mapbox_token").read()
-#print(ACCESS_TOKEN)
-#px.set_mapbox_access_token(ACCESS_TOKEN)
+@app.route("/")
+def home():
 
+    return render_template(
+        "index.html",
+        title="BDA Project Main Page",
+        
+    )
 
-#map_json = getInititalMap()    
+@app.route('/news')
+def updateNews():
+    url = "https://vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com/api/news/get-coronavirus-news/0"
 
+    headers = {
+        'x-rapidapi-key': "185d06fbe7msh83b44a43c780000p174286jsn1be10d4cfd4a",
+        'x-rapidapi-host': "vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com"
+        }
 
-spark = SparkSession.builder.appName("local").getOrCreate()
-spark.sparkContext.setLogLevel("ERROR")
-#df = getinitialMapDF(spark,map_json)
-mapDf = startMapStreamingDF(spark)
-app = dash.Dash()
-app.layout = html.Div([dcc.Graph(id="world-live", animate = True), dcc.Interval(id = 'update',interval = 20000,n_intervals = 0)])
-
-@app.callback(Output("world-live", "figure"),[Input("update", "n_intervals")])
-
-def update(n_intervals):
-    return updateMap(go,mapDf,px,ACCESS_TOKEN)
-
+    response = requests.request("GET", url, headers=headers)
+    dictionary = response.json()
+    news = dictionary['news']
+    news.reverse()
+    title = []
+    link = []
+    pub = []
+    content = []
+    reference = []
+    for i in range(len(news)):
+        title.append(news[i]['title'])
+        link.append(news[i]['link'])
+        pub.append(news[i]['pubDate'])
+        preprocess = re.sub(r"\[.*?\]", "", news[i]['content'])
+        preprocess = re.sub(r"\<.*?\>", "", preprocess)
+        content.append(preprocess)
+        reference.append(news[i]['reference'])
+    return render_template('news.html', content = content, title = title, link = link, length = len(news))
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run()

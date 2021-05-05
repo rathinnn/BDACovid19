@@ -9,24 +9,36 @@ from kafka import KafkaProducer
 
 
 producer = KafkaProducer(bootstrap_servers='localhost:9092',value_serializer=lambda v: json.dumps(v).encode('utf-8'))
-countries = ['india','pk','np']
-for country in countries:
+countries = ['india','uk','us','russia']
+try:
+    i=0
+    while True:
+        for country in countries:
+            if(i==0):
+                
+                h = requests.get('https://corona.lmao.ninja/v2/historical/'+country+'?lastdays=300')
+            else:
+                h = requests.get('https://corona.lmao.ninja/v2/historical/'+country+'?lastdays=1')
+            k = h.json()
+            l = k['timeline']
+            cases = l['cases']
+            deaths = l['deaths']
+            recovered = l['recovered']
+            jsonlist = []
 
-    h = requests.get('https://corona.lmao.ninja/v2/historical/'+country+'?lastdays=200')
-    k = h.json()
-    l = k['timeline']
-    cases = l['cases']
-    deaths = l['deaths']
-    recovered = l['recovered']
-    jsonlist = []
+        
+            for key in cases:
+                jsondict = {'Date':str(datetime.strptime(key, '%m/%d/%y')),'Cases':cases[key],'Deaths':deaths[key],'Recovered':recovered[key]}
+                jsonlist.append(jsondict)
 
+            sendToCountryTotalTopic(producer,country,jsonlist)
+            time.sleep(5)
+        i+=1
+        print("Ready 2")
+        time.sleep(800)
+        
+except KeyboardInterrupt:
 
-    for key in cases:
-        jsondict = {'Date':str(datetime.strptime(key, '%m/%d/%y')),'Cases':cases[key],'Deaths':deaths[key],'Recovered':recovered[key]}
-        jsonlist.append(jsondict)
+    print("Press Ctrl-C to terminate while statement")
 
-
-
-    sendToCountryTotalTopic(producer,country,jsonlist)
-    time.sleep(20)
-time.sleep(800)
+    pass
