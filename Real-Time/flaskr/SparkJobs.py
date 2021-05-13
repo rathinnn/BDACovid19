@@ -306,3 +306,27 @@ def RussiaTotalDF(spark):
         .start()
     df = spark.read.table("russiaTotalTable").sort("Date")
     return df
+
+def getwordsdf(spark):
+    lines = spark \
+        .readStream \
+        .format("socket") \
+        .option("host", "localhost") \
+        .option("port", 9998) \
+        .load()
+
+    words = lines.select(
+    explode(
+        split(lines.value, " ")
+    ).alias("word")
+    )
+
+    query = words \
+        .writeStream \
+        .format("memory") \
+        .queryName("wordstable")\
+        .outputMode("append") \
+        .start()
+    
+    df = spark.read.table("wordstable")
+    return df

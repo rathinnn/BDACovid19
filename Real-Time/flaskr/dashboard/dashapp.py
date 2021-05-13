@@ -17,7 +17,7 @@ from plots.mapPlot import updateMap
 from plots.graphPlot import updateCases, updateDeaths, updateRecovered
 from getData import getInititalMap
 from SparkJobs import getinitialMapDF, startMapStreamingDF, IndiaMapDF, USMapDF, UKMapDF, RussiaMapDF
-from SparkJobs import IndiaTotalDF, UKTotalDF, USTotalDF, RussiaTotalDF
+from SparkJobs import IndiaTotalDF, UKTotalDF, USTotalDF, RussiaTotalDF, getwordsdf
 from KafkaJobs import getConsumer,getDict, getGenerator
 
 def init_dashboard(server):
@@ -75,6 +75,8 @@ def init_dashboard(server):
     allprevdicts["USA"] = {}
     allprevdicts["Russia"] = {}
     allprevdicts["UK"] = {}
+
+    wordsdf = getwordsdf(spark)
     
     print("Start Kafka Now")
     countries = ["India","USA","UK","Russia"]
@@ -86,18 +88,18 @@ def init_dashboard(server):
         'bottom': 0,
         'width': '20%',
         'padding': '20px 10px',
-        'background-color': '#A35709'
+        'background-color': '#f8f9fa'
     }
 
     CARD_STYLE = {
-        'background-color': '#6D98AB'
+        
     }
 
     # the style arguments for the main content page.
     CONTENT_STYLE = {
         'margin-left': '25%',
         'margin-right': '5%',
-        #'padding': '20px 10p'
+        'padding': '20px 10p'
     }
 
     TEXT_STYLE = {
@@ -107,14 +109,14 @@ def init_dashboard(server):
 
     CARD_TEXT_STYLE = {
         'textAlign': 'center',
-        'color': '#FFFFFF'
+        'color': '#0074D9'
     }
 
     controls = dbc.FormGroup(
         [
             html.P('Country', style={
                 'textAlign': 'center',
-                'color' : '#FFFFFF'
+                
             }),
             dcc.Dropdown(
                 id="country",
@@ -127,7 +129,8 @@ def init_dashboard(server):
                 
             ),
             html.Div([dcc.Interval(id = 'update',interval = 2000000,n_intervals = 0)]),
-            html.Div([dcc.Interval(id = 'update2',interval = 600000,n_intervals = 0)])
+            html.Div([dcc.Interval(id = 'update2',interval = 600000,n_intervals = 0)]),
+            html.Div([dcc.Interval(id = 'update3',interval = 100,n_intervals = 0)])
         ]
     )
 
@@ -154,7 +157,7 @@ def init_dashboard(server):
                 ],
                 style = CARD_STYLE
             ),
-            md=3
+            md=4
         ),
         dbc.Col(
             dbc.Card(
@@ -171,7 +174,7 @@ def init_dashboard(server):
                 style = CARD_STYLE
 
             ),
-            md=3
+            md=4
         ),
         dbc.Col(
             dbc.Card(
@@ -187,60 +190,13 @@ def init_dashboard(server):
                 style = CARD_STYLE
 
             ),
-            md=3
-        ),
-        dbc.Col(
-            dbc.Card(
-                [
-                    dbc.CardBody(
-                        [
-                            html.H4(id='Total_words', children=['Total Words'], className='card-title',
-                                    style=CARD_TEXT_STYLE),
-                            html.P(id='card_words', children=['number'], style=CARD_TEXT_STYLE),
-                        ]
-                    ),
-                ],
-                style = CARD_STYLE
-            ),
-            md=3
+            md=4
         )
     ])
 
 
     content_first_row2 = dbc.Row([
-        dbc.Col(
-            dbc.Card(
-                [
 
-                    dbc.CardBody(
-                        [
-                            html.H4(id='New_Cases', children=['New Cases'], className='card-title',
-                                    style=CARD_TEXT_STYLE),
-                            html.P(id='new_cases', children=['number'], style=CARD_TEXT_STYLE),
-                        ]
-                    )
-                ],
-                style = CARD_STYLE
-            ),
-            md=3
-        ),
-        dbc.Col(
-            dbc.Card(
-                [
-
-                    dbc.CardBody(
-                        [
-                            html.H4(id='New_Deaths', children=['New Deaths'], className='card-title',
-                                    style=CARD_TEXT_STYLE),
-                            html.P(id='new_deaths', children=['number'], style=CARD_TEXT_STYLE),
-                        ]
-                    ),
-                ],
-                style = CARD_STYLE
-
-            ),
-            md=3
-        ),
         dbc.Col(
             dbc.Card(
                 [
@@ -255,7 +211,7 @@ def init_dashboard(server):
                 style = CARD_STYLE
 
             ),
-            md=3
+            md=4
         ),
         dbc.Col(
             dbc.Card(
@@ -270,7 +226,22 @@ def init_dashboard(server):
                 ],
                 style = CARD_STYLE
             ),
-            md=3
+            md=4
+        ),
+        dbc.Col(
+            dbc.Card(
+                [
+                    dbc.CardBody(
+                        [
+                            html.H4(id='Total_words', children=['Total Words (Testing)'], className='card-title',
+                                    style=CARD_TEXT_STYLE),
+                            html.P(id='card_words', children=['number'], style=CARD_TEXT_STYLE),
+                        ]
+                    ),
+                ],
+                style = CARD_STYLE
+            ),
+            md=4
         )
     ])
 
@@ -347,7 +318,7 @@ def init_dashboard(server):
         y3 = ndf['Recovered']
         return updateMap(go,curmapdf,px,ACCESS_TOKEN), updateCases(go,x,y1) , updateDeaths(go,x,y2), updateRecovered(go, x, y3)
 
-    @app.callback([Output("card_cases", "children") , Output("card_deaths", "children") , Output("card_recovered", "children") ,Output("new_cases", "children") , Output("new_deaths", "children") , Output("fatality_rate", "children") , Output("active_cases", "children")],[Input("update2", "n_intervals"),Input("country", "value")])
+    @app.callback([Output("card_cases", "children") , Output("card_deaths", "children") , Output("card_recovered", "children") , Output("fatality_rate", "children") , Output("active_cases", "children")],[Input("update2", "n_intervals"),Input("country", "value")])
     def update2(n_intervals,country):
         curgenerator = allgenerators[country]
         curprevdict = allprevdicts[country]
@@ -359,11 +330,16 @@ def init_dashboard(server):
             allgenerators[country] = getGenerator(allconsumers[country])
         
         #print(curdict)
-        return (curdict.value['TotalCases'],curdict.value['TotalDeaths'],curdict.value['TotalRecovered'],curdict.value['NewCases'],curdict.value['NewDeaths'],curdict.value['Case_Fatality_Rate'],curdict.value['ActiveCases'])
+        return (curdict.value['TotalCases'],curdict.value['TotalDeaths'],curdict.value['TotalRecovered'],curdict.value['Case_Fatality_Rate'],curdict.value['ActiveCases'])
 
-
+    @app.callback([Output("card_words", "children")],[Input("update3", "n_intervals")])
+    def update3(n_intervals):
+        #wordsdf.show()
+        return [wordsdf.count()]
 
     return app.server
+
+
 
 
 
