@@ -1,6 +1,6 @@
 # Covid Data Analysis And Real Time monitoring
 
-https://img.shields.io/pypi/pyversions/Django
+
 
 ## Abstract 
 As the world struggles with the pandemic, It is of utmost importance that we keep people
