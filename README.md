@@ -24,3 +24,6 @@ For the data analysis and ML modelling, we’ll be using the postman API for dat
 <p align="center">
 <img width="display: block; margin: auto;" alt="Screenshot 2021-04-18 at 8 37 43 PM" src="https://user-images.githubusercontent.com/52974732/115150506-55c57d80-a086-11eb-9e6c-44edd0277760.png">
 </p>
+
+#### Web Crawling, Indexing and Queries using Apache Nutch and Apache Solr
+https://drive.google.com/drive/folders/18ivGLij26JitfxB05EcVqExK-QmhnqvO?usp=sharing
