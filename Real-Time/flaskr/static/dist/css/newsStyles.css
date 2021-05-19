@@ -36,7 +36,7 @@ body * {
     text-decoration: none;
     outline: none;
     color: #00ddff;
-    transition: all 0.25s ease-in; 
+    transition: all 0.25s ease-in;
 }
 .shadow {
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.15);
@@ -60,11 +60,11 @@ body * {
 }
 
 .bg-color {
-    background-color: #4da8da;
+    background-color: #fafafa;
 }
 
 .grid-item {
-    background-color: #007cc7;
+    background-color: #fafafa;
     border-radius: 0.4rem;
     overflow: hidden;
     box-shadow: 0 3rem 6rem rgba(0, 0, 0, 0.1);

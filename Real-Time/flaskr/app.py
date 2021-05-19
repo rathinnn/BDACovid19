@@ -1,3 +1,4 @@
+import numpy as np
 import requests
 import pandas as pd
 import re
@@ -19,31 +20,15 @@ def home():
 
 @app.route('/news')
 def updateNews():
-    url = "https://vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com/api/news/get-coronavirus-news/0"
-
-    headers = {
-        'x-rapidapi-key': "185d06fbe7msh83b44a43c780000p174286jsn1be10d4cfd4a",
-        'x-rapidapi-host': "vaccovid-coronavirus-vaccine-and-treatment-tracker.p.rapidapi.com"
-        }
-
-    response = requests.request("GET", url, headers=headers)
-    dictionary = response.json()
-    news = dictionary['news']
-    news.reverse()
-    title = []
-    link = []
-    pub = []
-    content = []
-    reference = []
-    for i in range(len(news)):
-        title.append(news[i]['title'])
-        link.append(news[i]['link'])
-        pub.append(news[i]['pubDate'])
-        preprocess = re.sub(r"\[.*?\]", "", news[i]['content'])
-        preprocess = re.sub(r"\<.*?\>", "", preprocess)
-        content.append(preprocess)
-        reference.append(news[i]['reference'])
-    return render_template('news.html', content = content, title = title, link = link, length = len(news))
+    npurls = np.load('urls.npy')
+    urls = npurls.tolist()
+    nplink = np.load('link.npy')
+    link = nplink.tolist()
+    nptitle = np.load('title.npy')
+    title = nptitle.tolist()
+    npcontent = np.load('content.npy')
+    content = npcontent.tolist()
+    return render_template('news.html', urls = urls, content = content, title = title, link = link, length = len(title))
 
 if __name__ == '__main__':
     app.run()
