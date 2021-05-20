@@ -1,5 +1,7 @@
 # Covid Data Analysis And Real Time monitoring
 
+
+
 ## Abstract 
 As the world struggles with the pandemic, It is of utmost importance that we keep people
 well informed about the status of the pandemic and find patterns in the data to gain new
