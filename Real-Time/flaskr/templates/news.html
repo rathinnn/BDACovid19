@@ -6,18 +6,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/newsStyles.css') }}" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
-<body>  
+<body>
     <div class="grid">
       <div class="grid-item">
         {% for i in range(length) %}
-            <div class="card-content p-relative bg-color shadow blue-hover" style="width: 360px; overflow: hidden; border-radius: 1px;margin-top: 2rem;margin-bottom: 2rem;margin-left: auto;margin-right: auto">
-              <h1 class="card-header ff-serif" style="line-height: 1.25;margin-top: 0;margin-bottom: 0"> {{ title[i] }} </h1>
+            <div class="card-content p-relative bg-color shadow blue-hover" style="width: 500px; overflow: hidden; border-radius: 1px;margin-top: 2rem;margin-bottom: 2rem;margin-left: auto;margin-right: auto">
+                <img src="{{urls[i]}}" class="d-block w-full" style="width: 100%; display: block">
+                <h1 class="card-header ff-serif" style="line-height: 1.25;margin-top: 0;margin-bottom: 0"> {{ title[i] }} </h1>
               <p class="card-text" style="margin-bottom: 1rem">
                 {{ content[i] }}
               </p>
               <h2><a href = {{link[i]}} class="styled-link" style="text-transform: uppercase; font-weight: 500; margin-bottom: 2rem; text-align: center; display: inline-block;"> Read More</a> </h2>
           </div>
-        {% endfor %} 
+        {% endfor %}
       </div>
     </div>
 </body>
